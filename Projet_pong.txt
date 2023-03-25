@@ -1,3 +1,4 @@
+""Condortk est un module qui a été utilisé en classe et que j'ai donc reutilisé pour faire mon projet"
 from condortk import mise_a_jour, type_ev, ferme_fenetre
 from condortk import touche, cree_fenetre, efface_tout, donne_ev
 from condortk import cercle, rectangle,texte
