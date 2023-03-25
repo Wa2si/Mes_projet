@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+	<link rel="stylesheet" href={{ url_for('static', filename='style.css') }}>
+	<title>Annuaire</title>
+  </head>
+  
+  <body>
+
+    <h1>Annuaire téléphonique</h1>
+
+	
+	
+	<div class="voila">
+	<h2>Ajouter un contact :</h2>
+    
+	<form class="" action="ajtcontact" method="post" id="formajt" >
+      <input type="text" pattern="[a-zA-Z ]*" name="nom" title="3 à 15 caractères" minlength="3" maxlength="40"   required size="25" id="nom" placeholder="Nom du contact">
+	  <input type="tels" pattern="^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$"  name="numtel" minlength="10" required size="25" placeholder="Numéro de téléphone">
+      <button type="submit" class="button">Ajouter</button>
+	  <br>
+	  <span id="error1"></span>
+	  </br>
+    </form>
+	</div>
+	
+	<script>
+			let myformajt = document.getElementById('formajt');
+			const array = []
+			{% for mssg in affchcontact %}
+			array.push("{{mssg[0]}}")
+			{% endfor %}
+			
+			myformajt.addEventListener('submit', function(e){
+				let mynom = document.getElementById('nom');
+				mynom.value.toLowerCase();
+			    mynom.value = mynom.value && mynom.value[0].toUpperCase() + mynom.value.slice(1);
+				if(array.includes(mynom.value) == true){
+					let myerror = document.getElementById('error1'); 
+					myerror.innerHTML = "Le Nom à deja été rentré";
+					myerror.style.color = "white";
+					e.preventDefault();
+				
+				}
+			
+			
+			});
+	</script>
+	
+    <div class="voila">
+		<h2>Rechercher un contact :</h2>
+		<form class="" action="rechercher" method="post" >
+          <input type="text" name="recherch" required size="25" maxlength="40" placeholder="Nom du contact à rechercher" >
+		  <button type="submit" class="button"> Rechercher</button>
+		</form>
+		<br><h4> <img src="static\imgcontact.png" width="20" height="20"> {{message[0]}}  &nbsp;&nbsp;  
+		<img src="static\imgtelephone.png" width="20" height="20"> {{message[1]}} 
+		</h4></br>
+	</div>
+	
+	
+	<div class="voila"><h2>Tous les contacts :</h2></div>
+	{% for mssg in affchcontact %}
+	
+	<form class="" action="supprcontact" method="post" >
+	<br><div class="gauche" class="voila"><img src="static\imgcontact.png" width="20" height="20">  {{mssg[0]}} &nbsp;&nbsp;
+	<input type="text" class="invisible" value="{{mssg[0]}}" name="nomsuppr"/>
+	<button type="submit" class="bouton">Supprimer</button>
+    <input type="button" id="{{mssg[1]}}" value="[+] Afficher" onclick="afficher('{{mssg[0]}}','{{mssg[1]}}')" class="bouton" /></div></br>
+    </form>
+	
+
+	<div id="{{mssg[0]}}" style="display: none;" class="gauche" class="voila"  >
+	<img src="static\imgcontact.png" width="20" height="20"> {{mssg[0]}} &nbsp;&nbsp; 
+	<img src="static\imgtelephone.png" width="20" height="20"> {{mssg[1]}}
+	<br>
+	<form class="" action="modifiercontact" method="post" id="{{mssg[0]}}m" >
+		<input type="text" pattern="[a-zA-Z ]*" name="nouveaunom" title="3 à 15 caractères" minlength="3" maxlength="40" value="{{mssg[0]}}" required size="18" id="{{mssg[1]}}m" placeholder="Nouveau nom">
+		<input type="tels" pattern="^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$" value="{{mssg[1]}}" name="nouveaunum" minlength="10" required size="18" placeholder="Nouveau numéro">
+		<input type="text" class="invisible" value="{{mssg[0]}}" id="{{mssg[1]}}m2" name="nom_modif"/>
+		<button type="submit" class="button" onclick="verifform('{{mssg[0]}}m','{{mssg[1]}}m','{{mssg[1]}}m2')">Modifier</button>
+		<br>
+		<span id="error2{{mssg[0]}}m"></span>
+		</br>
+	</form>
+	</div>
+
+	<script>
+		function verifform(nomform,id,nomcontact){
+			let myformajt2 = nomform;
+			const array2 = []
+			{% for mssg in affchcontact %}
+			array2.push("{{mssg[0]}}")
+			{% endfor %}
+			
+
+			let mynom2 = document.getElementById(id);
+			mynom2.value.toLowerCase();
+			mynom2.value = mynom2.value && mynom2.value[0].toUpperCase() + mynom2.value.slice(1);
+			let mynom3 = document.getElementById(nomcontact);
+			if(array2.includes(mynom2.value) == true && !(mynom2.value == mynom3.value) ){
+				
+				let myerror2 = document.getElementById('error2'+ nomform); 
+				myerror2.innerHTML = "Le Nom à deja été rentré, la page va se rafraîchir";
+				myerror2.style.color = "white";
+
+				document.getElementById(myformajt2).addEventListener("submit", function(event){
+				event.preventDefault()
+
+				});
+				setTimeout(window.location.reload.bind(window.location), 3000);
+			
+			}
+
+			
+			};
+			
+    </script>
+	 
+	{% endfor %}
+	
+	<script type="text/javascript">
+		function afficher(doc1,bouton1) {
+		   
+			doc = document.getElementById(doc1);
+			bouton = document.getElementById(bouton1);
+			  
+			if (doc.style.display == 'none') {
+		 
+				   doc.style.display = 'block';
+				   bouton.value = '[-] Masquer';
+			 }
+		 
+			 else {
+		 
+				   doc.style.display = 'none';
+				   bouton.value = '[+] Afficher';
+			 }
+		}
+	</script>
+ 
+
+
+
+	  </body>
+	</html>
+
+
