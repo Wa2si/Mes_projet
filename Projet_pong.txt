@@ -14,7 +14,7 @@ rayon_balle = 10
 
 
 def affiche_balle(position_balle,couleur_balle):
-    """ Ne pas modifier. Affiche un cercle correspondant à la balle à la
+    """ Affiche un cercle correspondant à la balle à la
     position position_balle où position_balle est un couple (tuple) de
     coordonnées.
     Parameters:
@@ -25,7 +25,7 @@ def affiche_balle(position_balle,couleur_balle):
 
 
 def affiche_pong(position_pong, droite_gauche,couleur_pong):
-    """ Ne pas modifier. Affiche un rectangle correspondant à la raquette
+    """ Affiche un rectangle correspondant à la raquette
     centré à la position position_pong où position_pong est l'ordonnée de la
     position de la raquette.
     Peut afficher la raquette à gauche ou à droite en fonction du
@@ -45,7 +45,7 @@ def affiche_pong(position_pong, droite_gauche,couleur_pong):
 
 
 def mouvement_ordi(position_balle, position_pong1):
-    """ Ne pas modifier, gère le déplacement de l'ordinateur """
+    """ gère le déplacement de l'ordinateur """
     x, y = position_balle
     if y > position_pong1 + hauteur_pong / 4:
         return position_pong1 + 5
@@ -56,7 +56,7 @@ def mouvement_ordi(position_balle, position_pong1):
 
 
 def detection_impact_pong(position_pong1, position_pong2, position_balle, direction_balle):
-    """ Ne pas modifier. Fonction permettant de détecter l'impact entre une
+    """ Fonction permettant de détecter l'impact entre une
     raquette et la balle et changeant la direction de celle-ci """
     x, y = position_balle
     dx, dy = direction_balle
@@ -78,7 +78,7 @@ def detection_impact_pong(position_pong1, position_pong2, position_balle, direct
 
 
 def deplacement_balle(position_balle, direction_balle):
-    ''' Ne pas modifier. Permet de calculer la nouvelle position de la balle à partir de
+    '''Permet de calculer la nouvelle position de la balle à partir de
     sa position initiale et de la direction (mouvement) dans laquelle elle va.
     Parameters:
         position_balle (float, float): couple de coordonnées de la balle
