@@ -1,0 +1,104 @@
+"""
+Tic Tac Toe
+Le jeu Tic Tac Toe (également connu sous le nom de Morpion) est un jeu de société pour deux joueurs. Le plateau de jeu est une grille de 3x3 cases, et chaque joueur doit placer ses pions (X ou O) sur le plateau à tour de rôle. Le but du jeu est d'aligner trois pions de sa couleur horizontalement, verticalement ou diagonalement.
+
+Comment j'ai développé le jeu
+Le jeu Tic Tac Toe a été développé en utilisant le langage de programmation Python. J'ai utilisé une approche procédurale pour concevoir le jeu, en décomposant le processus en plusieurs fonctions qui effectuent des tâches spécifiques.
+
+Le code que je vous ai donné contient les fonctions suivantes:
+
+afficher_plateau(plateau)
+Cette fonction affiche le plateau de jeu sur la console en utilisant des caractères ASCII pour représenter les cases vides, les pions X et les pions O.
+
+verifier_victoire(plateau, joueur)
+Cette fonction vérifie si le joueur donné a gagné en vérifiant les lignes, les colonnes et les diagonales du plateau.
+
+placer_pion(plateau, joueur, ligne, colonne)
+Cette fonction permet au joueur donné de placer son pion sur le plateau en entrant les coordonnées de ligne et de colonne correspondantes. Elle vérifie également si les coordonnées données sont valides et si la case est vide.
+
+tour_de_jeu(plateau, joueur)
+Cette fonction gère le tour de jeu du joueur donné. Elle affiche le plateau de jeu, permet au joueur de placer son pion en entrant des coordonnées de ligne et de colonne, et vérifie si le joueur a gagné ou si le jeu est terminé.
+
+jouer()
+Cette fonction principale exécute le jeu en initialisant le plateau de jeu avec des cases vides, alternant entre les joueurs à chaque tour, et vérifiant si le jeu est terminé à la fin de chaque tour. Si un joueur a gagné, la fonction affiche un message de victoire. Si le jeu se termine par une égalité, la fonction affiche un message de match nul.
+
+Comment jouer
+Pour jouer au Tic Tac Toe, vous devrez exécuter le code dans un environnement Python. Vous pouvez le faire en copiant le code dans un éditeur de texte ou un environnement de développement Python, puis en l'exécutant.
+
+Lorsque vous lancez le jeu, vous serez invité à entrer les coordonnées de ligne et de colonne pour placer votre premier pion. Les coordonnées doivent être des nombres entiers compris entre 0 et 2.
+
+À chaque tour, le joueur en cours doit placer son pion sur une case vide en entrant les coordonnées de ligne et de colonne correspondantes. Les coordonnées de ligne et de colonne doivent être des nombres entiers compris entre 0 et 2.
+
+Le premier joueur qui aligne trois pions de sa couleur horizontalement, verticalement ou diagonalement gagne le jeu. Si toutes les cases du plateau sont remplies sans qu'aucun joueur n'ait aligné
+
+"""
+
+import random
+
+def afficher_plateau(plateau):
+    print(plateau[0][0] + "|" + plateau[0][1] + "|" + plateau[0][2])
+    print("-+-+-")
+    print(plateau[1][0] + "|" + plateau[1][1] + "|" + plateau[1][2])
+    print("-+-+-")
+    print(plateau[2][0] + "|" + plateau[2][1] + "|" + plateau[2][2])
+
+def verifier_victoire(plateau, joueur):
+    # Vérifier les lignes
+    for i in range(3):
+        if plateau[i][0] == plateau[i][1] == plateau[i][2] == joueur:
+            return True
+    
+    # Vérifier les colonnes
+    for i in range(3):
+        if plateau[0][i] == plateau[1][i] == plateau[2][i] == joueur:
+            return True
+    
+    # Vérifier les diagonales
+    if plateau[0][0] == plateau[1][1] == plateau[2][2] == joueur:
+        return True
+    if plateau[0][2] == plateau[1][1] == plateau[2][0] == joueur:
+        return True
+    
+    return False
+
+def effectuer_coup(plateau, ligne, colonne, joueur):
+    if plateau[ligne][colonne] == " ":
+        plateau[ligne][colonne] = joueur
+        return True
+    else:
+        return False
+
+def jouer_tour(plateau, joueur):
+    if joueur == "X":
+        ligne = int(input("Entrez la ligne (0, 1 ou 2) pour " + joueur + " : "))
+        colonne = int(input("Entrez la colonne (0, 1 ou 2) pour " + joueur + " : "))
+    else:
+        print("Robot joue...")
+        ligne = random.randint(0, 2)
+        colonne = random.randint(0, 2)
+    
+    if effectuer_coup(plateau, ligne, colonne, joueur):
+        afficher_plateau(plateau)
+        if verifier_victoire(plateau, joueur):
+            print(joueur + " a gagné !")
+            return True
+        elif " " not in plateau[0] and " " not in plateau[1] and " " not in plateau[2]:
+            print("Match nul !")
+            return True
+        else:
+            return False
+    else:
+        print("Coup invalide. Essayez à nouveau.")
+        return False
+
+def jeu_tic_tac_toe():
+    plateau = [[" ", " ", " "], [" ", " ", " "], [" ", " ", " "]]
+    joueur = "X"
+    fin_de_jeu = False
+    
+    while not fin_de_jeu:
+        fin_de_jeu = jouer_tour(plateau, joueur)
+        if joueur == "X":
+            joueur = "O"
+        else:
+            joueur = "X"
