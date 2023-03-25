@@ -1,0 +1,248 @@
+from condortk import mise_a_jour, type_ev, ferme_fenetre
+from condortk import touche, cree_fenetre, efface_tout, donne_ev
+from condortk import cercle, rectangle,texte
+from time import sleep
+
+# dimensions du jeu
+hauteur_pong = 100
+largeur_pong = 10
+largeur_fenetre = 640
+hauteur_fenetre = 480
+distance_pong_bord = 30
+rayon_balle = 10
+
+
+def affiche_balle(position_balle,couleur_balle):
+    """ Ne pas modifier. Affiche un cercle correspondant à la balle à la
+    position position_balle où position_balle est un couple (tuple) de
+    coordonnées.
+    Parameters:
+        position_balle (int,int): couple des coordonnées de la balle
+    """
+    x, y = position_balle
+    cercle(x, y, rayon_balle, couleur_balle, couleur_balle)
+
+
+def affiche_pong(position_pong, droite_gauche,couleur_pong):
+    """ Ne pas modifier. Affiche un rectangle correspondant à la raquette
+    centré à la position position_pong où position_pong est l'ordonnée de la
+    position de la raquette.
+    Peut afficher la raquette à gauche ou à droite en fonction du
+    paramètre droite_gauche
+    Parameters:
+        position_pong (int): ordonnée de la raquette
+        droite_gauche (str): prend les valeurs "gauche" ou "droite" en
+        fonction de la raquette à afficher
+    """
+    if droite_gauche == "gauche":
+        x = distance_pong_bord
+    else:
+        x = largeur_fenetre - distance_pong_bord
+    y = position_pong
+    rectangle(x-largeur_pong/2, y-hauteur_pong/2,
+              x+largeur_pong/2, y+hauteur_pong/2,  couleur_pong, couleur_pong)
+
+
+def mouvement_ordi(position_balle, position_pong1):
+    """ Ne pas modifier, gère le déplacement de l'ordinateur """
+    x, y = position_balle
+    if y > position_pong1 + hauteur_pong / 4:
+        return position_pong1 + 5
+    elif y < position_pong1 - hauteur_pong / 4:
+        return position_pong1 - 5
+    else:
+        return position_pong1
+
+
+def detection_impact_pong(position_pong1, position_pong2, position_balle, direction_balle):
+    """ Ne pas modifier. Fonction permettant de détecter l'impact entre une
+    raquette et la balle et changeant la direction de celle-ci """
+    x, y = position_balle
+    dx, dy = direction_balle
+    x_pong1, y_pong1 = distance_pong_bord, position_pong1
+    x_pong2, y_pong2 = largeur_fenetre - distance_pong_bord, position_pong2
+    balle_sur_pong1 = y < y_pong1 + hauteur_pong / 2 and \
+        y > y_pong1 - hauteur_pong / 2 and \
+        x - rayon_balle < x_pong1 + largeur_pong / 2 and \
+        x - rayon_balle > x_pong1 - largeur_pong / 2
+    balle_sur_pong2 = y < y_pong2 + hauteur_pong / 2 and \
+        y > y_pong2 - hauteur_pong / 2 and \
+        x + rayon_balle < x_pong2 + largeur_pong / 2 and \
+        x + rayon_balle > x_pong2 - largeur_pong / 2
+    if balle_sur_pong1:
+        return -dx, dy + (y - y_pong1)/100
+    if balle_sur_pong2:
+        return -dx, dy + (y - y_pong2)/100
+    return dx, dy
+
+
+def deplacement_balle(position_balle, direction_balle):
+    ''' Ne pas modifier. Permet de calculer la nouvelle position de la balle à partir de
+    sa position initiale et de la direction (mouvement) dans laquelle elle va.
+    Parameters:
+        position_balle (float, float): couple de coordonnées de la balle
+        direction_balle (float, float): couple de déplacement à ajouter aux
+        coordonnées
+    Returns:
+        (float, float): nouvelles coordonnées de la balle
+    '''
+    x, y = position_balle
+    dx, dy = direction_balle
+    return x + dx, y + dy
+
+
+def change_direction_pong2(touche):
+    
+    if touche == "Up" :
+        return -20
+    elif touche == "Down" :
+        return 20
+    else :
+        return 0  # à modifier
+
+
+def detection_bord(position_balle, direction_balle):
+    
+    
+    x, y = position_balle  # récupère l'abscisse et l'ordonnée de la balle
+    dx, dy = direction_balle  # récupère la direction de la balle suivant les
+    # les abscisses et suivant les ordonnées
+    if x+ dx + rayon_balle > largeur_fenetre or x+dx < 0 :
+        return -dx,dy
+    elif y + dy + rayon_balle > hauteur_fenetre or y + dy < 0:
+        return dx,-dy
+    else :
+        return dx, dy
+
+
+def detection_sortie(position_balle):
+    ''' Permet de détecter la sortie de la balle d'un côté ou d'un autre.
+    Renvoie la chaine de caractère "pong1" si la balle sort à gauche, "pong2"
+    elle sort à droite, "continue" sinon.
+    Parameters:
+        position_balle (float, float): couple des coordonnées de la
+        balle_sur_pong1
+    Returns:
+        (string): "pong1" si la balle sort à gauche, "pong2"
+        elle sort à droite, "continue" sinon
+    '''
+    x, y = position_balle
+    if x - rayon_balle == 0:
+        return "pong1"
+
+    elif x + rayon_balle == largeur_fenetre:
+        return "pong2"
+
+    else:
+        return "continue"
+
+def deplacement_pong(position_pong, direction_pong):
+    
+    
+    return position_pong + direction_pong  
+
+
+def fin_de_jeu(sortie):
+    ''' Permet de sortir de la boucle principale du jeu.
+    Parameters:
+        sortie (str): information de sortie d'un côté ("pong1), de l'autre
+        ("pong2") ou de non sortie ("continue")
+    Returns:
+        (bool): True si la balle est sortie, False sinon
+    '''
+    if sortie == "pong1" or sortie == "pong2":
+        return False
+
+    else:
+        return True  # à modifier
+
+
+def affiche_victoire(sortie):
+    ''' Fonction permettant de gérer graphiquement la fin de jeu
+    Parameters:
+        sortie (str): information de sortie d'un côté ("pong1), de l'autre
+        ("pong2") ou de non sortie ("continue")
+    Returns:
+        ...
+    '''
+    if sortie == "pong1":
+        if arriere_plan == 'black':
+            texte(270, 200, "Gagné !",'white')
+        else:
+           texte(270, 200, "Gagné !")
+    else:
+        if arriere_plan == 'black':
+            texte(270, 200, "Perdu !",'white')
+        else : 
+            texte(270, 200, "Perdu !")
+    mise_a_jour()
+
+    sleep(5)
+
+
+# programme principal
+if __name__ == "__main__":
+    
+    # initialisation du jeu
+
+    framerate = int(input("Choissisez la vitesse de la balle : ")) # taux de rafraîchissement du jeu en images/s
+    direction_balle = (5, 0.5)  # direction initiale de la balle
+    position_balle = (320, 240)  # position initiale de la balle
+    position_pong1 = 240
+    position_pong2 = 240
+    choix_theme = input("Choissisez soit le thème 'sombre' ou le thème 'claire' : ")    
+    if choix_theme == 'sombre':
+        arriere_plan = 'black'
+        couleur_balle = 'white'
+        couleur_pong  = 'white'
+    if choix_theme == 'claire':
+        arriere_plan = 'claire'
+        couleur_balle = 'black'
+        couleur_pong  = 'black'
+    cree_fenetre(largeur_fenetre, hauteur_fenetre)
+    
+    
+    
+    # boucle principale
+    jouer = True
+    while jouer:
+        
+        # affichage des objets
+        efface_tout()  # efface tous les objet
+        if arriere_plan == 'black':
+            rectangle(0, 0, largeur_fenetre, hauteur_fenetre, couleur='black', remplissage='black')
+        affiche_pong(position_pong1, "gauche", couleur_pong)  # affiche la raquette gauche
+        affiche_pong(position_pong2, "droite", couleur_pong)  # affiche la raquette gauche
+        affiche_balle(position_balle,couleur_balle)  # affiche la balle
+        mise_a_jour()  # met à jour l'affichage
+
+        direction_pong2 = 0  # remet le mouvement du pong de droite à 0
+
+        # gestion des événements
+        ev = donne_ev()  # récupère les évènements clavier ou souris
+        ty = type_ev(ev)  # récupère le type d'événement
+        if ty == 'Quitte':
+            jouer = False
+            break
+        elif ty == 'Touche':  # Si c'est un événement clavier
+            # print(touche(ev))
+            direction_pong2 = change_direction_pong2(touche(ev))
+        position_pong1 = mouvement_ordi(position_balle, position_pong1)
+        position_pong2 = deplacement_pong(position_pong2, direction_pong2)
+        direction_balle = detection_impact_pong(
+            position_pong1, position_pong2, position_balle, direction_balle)
+        direction_balle = detection_bord(position_balle, direction_balle)
+        sortie = detection_sortie(position_balle)
+        position_balle = deplacement_balle(position_balle, direction_balle)
+        jouer = fin_de_jeu(sortie)
+        # attente avant rafraîchissement
+        sleep(1/framerate)
+       
+    
+    # Affichage fin de jeu
+    if ty != 'Quitte':
+        affiche_victoire(sortie)
+        ferme_fenetre()
+    else :
+    # fermeture et sortie
+        ferme_fenetre()
